@@ -1,9 +1,16 @@
 import 'dart:math';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
 import 'tree.dart';
 
 class Obstacle {
   bool isInCollision(Edge edge) {
     return false;
+  }
+
+  Widget getWidget() {
+    return Text("RETURN");
   }
 }
 
@@ -14,7 +21,11 @@ class RectangleObstacle extends Obstacle {
   double height;
 
   // Constructor
-  RectangleObstacle({required this.top, required this.left, required this.width, required this.height});
+  RectangleObstacle(
+      {required this.top,
+      required this.left,
+      required this.width,
+      required this.height});
 
   // Getters
   double get getTop => top;
@@ -27,6 +38,18 @@ class RectangleObstacle extends Obstacle {
   set setLeft(double newLeft) => left = newLeft;
   set setWidth(double newWidth) => width = newWidth;
   set setHeight(double newHeight) => height = newHeight;
+
+  Widget getWidget() {
+    return Positioned(
+      left: left, // Adjust the horizontal position
+      top: top, // Adjust the vertical position
+      child: Container(
+        width: width,
+        height: height,
+        color: Colors.black,
+      ),
+    );
+  }
 
   @override
   bool isInCollision(Edge edge) {
@@ -56,8 +79,10 @@ class RectangleObstacle extends Obstacle {
   }
 
   bool _isPointInside(Node point) {
-    return point.x >= left && point.x <= left + width &&
-        point.y >= top && point.y <= top + height;
+    return point.x >= left &&
+        point.x <= left + width &&
+        point.y >= top &&
+        point.y <= top + height;
   }
 
   bool _doEdgesIntersect(Edge edge1, Edge edge2) {
@@ -87,7 +112,8 @@ class CircleObstacle extends Obstacle {
   double radius;
 
   // Constructor
-  CircleObstacle({required this.centerX, required this.centerY, required this.radius});
+  CircleObstacle(
+      {required this.centerX, required this.centerY, required this.radius});
 
   // Getters
   double get getCenterX => centerX;
@@ -98,6 +124,23 @@ class CircleObstacle extends Obstacle {
   set setCenterX(double newCenterX) => centerX = newCenterX;
   set setCenterY(double newCenterY) => centerY = newCenterY;
   set setRadius(double newRadius) => radius = newRadius;
+
+  @override
+  Widget getWidget() {
+    return Positioned(
+      left: centerX - radius, // Adjust the horizontal position
+      top: centerY - radius, // Adjust the vertical position
+      child: Container(
+        width: radius * 2,
+        height: radius * 2,
+        decoration: BoxDecoration(
+          color: Colors.black,
+          shape: BoxShape.circle,
+        ),
+      ),
+    );
+  }
+
 
   @override
   bool isInCollision(Edge edge) {

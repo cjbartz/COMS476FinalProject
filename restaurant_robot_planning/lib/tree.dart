@@ -50,7 +50,7 @@ class Tree {
       }
     }
 
-    return []; // Return an empty list if no path is found
+    return [Node(x: 0, y: 0)]; // Return 0, 0 if no path is found
   }
 
   List<Node> _buildPath(Map<Node, Node> visited, Node currentNode) {
@@ -72,48 +72,77 @@ class Tree {
     Random random = Random();
 
     nodes.add(start);
+    bool notConnected = true;
 
-    for (int i = 0; i < maxNodes; i++) {
+    while(notConnected) {
+      //print("Debugging this for loop: " + i.toString());
       // Generate a random point in the space
-      double randomX = random.nextDouble() * (goal.x - start.x) + start.x;
-      double randomY = random.nextDouble() * (goal.y - start.y) + start.y;
+      double min_border = 0;
+      double max_border_y = 600;
+      double max_border_x = 410;
+      double randomX = min_border + (max_border_x - min_border) * random.nextDouble();
+      double randomY = min_border + (max_border_y - min_border) * random.nextDouble();
       Node randomPoint = Node(x: randomX, y: randomY);
+
+      // Try and connect to goal
+      if (random.nextInt(100) == 5){
+        print("Attempting to connect to goal node");
+        randomPoint = goal;
+      }
+
+      randomPoint.print_node();
+
 
       // Find the nearest point in the tree, considering both nodes and points on edges
       Node nearestPoint = start;
       double minDistance = _distance(nearestPoint, randomPoint);
-
+      bool foundEdgeNode = false;
+      Edge edgeNewPointIsOn = Edge(node1: Node(x: 0, y: 0), node2: Node(x: 0, y: 0));
       for (Edge edge in edges) {
         Node edgePoint = _nearestPointOnEdge(edge, randomPoint);
         double currentDistance = _distance(edgePoint, randomPoint);
         if (currentDistance < minDistance) {
           nearestPoint = edgePoint;
           minDistance = currentDistance;
+          foundEdgeNode = true;
+          edgeNewPointIsOn = edge;
         }
       }
 
-      // Calculate the point in the direction of the random point, limited by maxStepSize
-      double theta = atan2(randomPoint.y - nearestPoint.y, randomPoint.x - nearestPoint.x);
-      double newX = nearestPoint.x + cos(theta) * min(maxStepSize, minDistance);
-      double newY = nearestPoint.y + sin(theta) * min(maxStepSize, minDistance);
-      Node newPoint = Node(x: newX, y: newY);
+
+      //Node newPoint = nearestPoint;
 
       // Check for collisions
-      Edge newEdge = Edge(node1: nearestPoint, node2: newPoint);
+      Edge newEdge = Edge(node1: nearestPoint, node2: randomPoint);
       bool collision = false;
       for (Obstacle obstacle in obstacles) {
         if (obstacle.isInCollision(newEdge)) {
           collision = true;
+          print("WAS IN COLLISION");
+          newEdge.node1.print_node();
+          newEdge.node2.print_node();
           break;
         }
       }
 
       // If no collision, add the new point and edge to the tree
       if (!collision) {
-        nodes.add(newPoint);
+        if(foundEdgeNode){
+          _splitEdge(edgeNewPointIsOn, nearestPoint);
+        }
+        nodes.add(nearestPoint);
         edges.add(newEdge);
+        if(randomPoint == goal){
+          notConnected = false;
+        }
       }
     }
+  }
+
+  void _splitEdge(Edge edge, Node newNode){
+    edges.add(Edge(node1: edge.getNode1, node2: newNode));
+    edges.add(Edge(node1: newNode, node2: edge.getNode2));
+    edges.remove(edge);
   }
 
   Node _nearestPointOnEdge(Edge edge, Node point) {
@@ -145,6 +174,38 @@ class Tree {
     return sqrt(dx * dx + dy * dy);
   }
 
+  void printTree(Node root) {
+    if (root == null) {
+      print("The tree is empty.");
+      return;
+    }
+
+    final visited = <Node>{};
+    final queue = <Node>[];
+    visited.add(root);
+    queue.add(root);
+
+    while (queue.isNotEmpty) {
+      final current = queue.removeAt(0);
+      final children = <Node>[];
+
+      for (final edge in edges) {
+        if (edge.node1 == current && !visited.contains(edge.node2)) {
+          children.add(edge.node2);
+          visited.add(edge.node2);
+          queue.add(edge.node2);
+        } else if (edge.node2 == current && !visited.contains(edge.node1)) {
+          children.add(edge.node1);
+          visited.add(edge.node1);
+          queue.add(edge.node1);
+        }
+      }
+
+      print("${current.coords()} -> ${children.map((c) => c.coords()).join(', ')}");
+    }
+  }
+
+
 }
 
 class Node {
@@ -172,6 +233,14 @@ class Node {
 
   void print_node(){
     print('' + x.toString() + ', ' + y.toString());
+  }
+
+  String coords(){
+    return '(' + x.toString() + ', ' + y.toString() + ')';
+  }
+
+  Offset getOffset(){
+    return Offset(x, y);
   }
 }
 
