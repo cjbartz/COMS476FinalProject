@@ -70,9 +70,14 @@ class MyHomePageState extends State<MyHomePage> {
   List<Offset> _points = [Offset(10, 10)];
   List<Offset> _edgeCoordinates = [];
   List<Obstacle> _obstacles = [
-    //RectangleObstacle(top: 100, left: 100, width: 100, height: 50),
-    CircleObstacle(centerX: 200, centerY: 200, radius: 50),
-    CircleObstacle(centerX: 300, centerY: 300, radius: 50),
+    RectangleObstacle(top: 80, left: 50, width: 50, height: 50),
+    RectangleObstacle(top: 80, left: 150, width: 50, height: 50),
+    RectangleObstacle(top: 80, left: 250, width: 50, height: 50),
+    RectangleObstacle(top: 80, left: 350, width: 50, height: 50),
+    CircleObstacle(centerX: 125, centerY: 200, radius: 50),
+    CircleObstacle(centerX: 275, centerY: 200, radius: 50),
+    RectangleObstacle(top: 280, left: 50, width: 50, height: 50),
+    RectangleObstacle(top: 280, left: 150, width: 50, height: 50),
   ];
 
   List<Offset> _getPath(){
@@ -172,7 +177,12 @@ class MyHomePageState extends State<MyHomePage> {
 
                 _obstacles[0].getWidget(),
                 _obstacles[1].getWidget(),
-                //_obstacles[2].getWidget(),
+                _obstacles[2].getWidget(),
+                _obstacles[3].getWidget(),
+                _obstacles[4].getWidget(),
+                _obstacles[5].getWidget(),
+                _obstacles[6].getWidget(),
+                _obstacles[7].getWidget(),
 
                 Positioned(
                   bottom: 50, // Adjust the horizontal position

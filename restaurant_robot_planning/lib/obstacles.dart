@@ -79,10 +79,10 @@ class RectangleObstacle extends Obstacle {
   }
 
   bool _isPointInside(Node point) {
-    return point.x >= left &&
-        point.x <= left + width &&
-        point.y >= top &&
-        point.y <= top + height;
+    return point.x > left &&
+        point.x < left + width &&
+        point.y > top &&
+        point.y < top + height;
   }
 
   bool _doEdgesIntersect(Edge edge1, Edge edge2) {
@@ -97,10 +97,10 @@ class RectangleObstacle extends Obstacle {
 
     double det = (bx - ax) * (dy - cy) - (by - ay) * (dx - cx);
 
-    if (det == 0) return false;
+    if (det.abs() < 1e-10) return false;
 
-    double s = ((ax - cx) * (dy - cy) - (ay - cy) * (dx - cx)) / det;
-    double t = ((cx - ax) * (by - ay) - (cy - ay) * (bx - ax)) / det;
+    double s = ((cx - ax) * (by - ay) - (cy - ay) * (bx - ax)) / det;
+    double t = ((cx - ax) * (dy - cy) - (cy - ay) * (dx - cx)) / det;
 
     return s >= 0 && s <= 1 && t >= 0 && t <= 1;
   }
